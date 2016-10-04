@@ -1,8 +1,9 @@
 from oplog_config import host,port,changes_collection,changes_db
 from global_congif import main_field  # Imports field artist name ............not hardcoded for extensibility
+from global_congif import client_db,client_collection
 from pymongo import MongoClient
 from pymongo import bulk
-
+import time
 def get_changed_docs():
 	""" Function to fetch docs which very whose notificatons have not been sen to the users. """
 	try:
@@ -23,31 +24,40 @@ def fetch_clients(main_field,main_value):
 	""" fetches client docs according to changed documents"""
 	try:
 		client = MongoClient(host,port)
-		db=client[changes_db]
-		col=db[changes_collection]
+		db=client[client_db]
+		col=db[client_collection]
 		
 		"""Cases for diferent types in which main_field can be given
 		Case1:	artist_name: [only one artist]
 		Case2: 	artist_name: [list of multiple artists]
 		Case3:  artist_name: [all]
 		"""
-		client_docs=col.find({"$or":[
-										{main_field: { "$in": ["all",main_value] } }
-			]})
+
+		# subscription is field name for each user
+		query={"subscription":{
+								"$elemMatch": {
+												main_field : { "$in": ["all",main_value] }
+												} 
+							}              
+			}
+		print query
+		client_docs=col.find()
 		client.close()
 		return client_docs
 	except Exception as e:
 		print "Could not fetch client documents"
 		print e
+		return[]
 
-
-def process_client(changed_doc,client):
+def process_client(changed_doc,client_doc):
 	print "processing"
 	""" Process each client for their particular specification 
 	Eg:  For instance, Blair only wants to track changes made to Chuck's whereabouts while Georgina wants to track everything about everyone.
 
 	"""
-	print changed_doc,client
+
+
+	print changed_doc,client_doc
 	return "done"
 
 def generate_notifications(changed_doc):
@@ -55,10 +65,12 @@ def generate_notifications(changed_doc):
 	print changed_doc
 	main_value=changed_doc[main_field]
 	clients=fetch_clients(main_field,main_value)
-	for client in clients:
-		print client
-		notification=process_client(changed_doc,clients)
-		
+	notifications_list=[]
+	for client_doc in clients:
+		print client_doc
+		notifications=process_client(changed_doc,client_doc)
+		notifications_list.extend(notifications)
+	return notifications_list
 def send_notifications(notifications):
 	return True
 
@@ -84,11 +96,11 @@ def driver_function():
 				print doc
 				notifications=generate_notifications(doc) # List of notifications to be sent
 				status=send_notifications(notifications)
-				if staus:
+				if status:
 					update_chaged_doc(doc)
 		else:
-			print "No Doc"
 			pass
+		time.sleep(1)
 
 if __name__ == '__main__':
 	driver_function()

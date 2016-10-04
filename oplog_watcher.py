@@ -31,6 +31,7 @@ def watcher():
 		tail_opts = { 'tailable': True, 'await_data': True }
 		# get the latest timestamp in the database
 		last_ts = db.oplog.rs.find().sort('$natural', -1)[0]['ts']
+		print last_ts
 		while True:
 			query = { 'ts': { '$gt': last_ts } }  						#To get the latest timestamp from the oplog
 			cursor = db.oplog.rs.find(query, **tail_opts)				#To get the docs which have been changed from the oplog
@@ -44,7 +45,7 @@ def watcher():
 					print e,"@"
 					time.sleep(sleep)
 	except Exception as e:
-		print("Unable to run oplog_watcher")
+		print("Unable to run oplog_watcher")                            #This error will mostly come if either mongo is not running or replica set is not configured for oplog
 		print e
 		
 if __name__ == '__main__':
