@@ -31,17 +31,15 @@ def watcher():
 		tail_opts = { 'tailable': True, 'await_data': True }
 		# get the latest timestamp in the database
 		last_ts = db.oplog.rs.find().sort('$natural', -1)[0]['ts']
-		print last_ts
-
 		while True:
-			query = { 'ts': { '$gt': last_ts } }
-			cursor = db.oplog.rs.find(query, **tail_opts)
+			query = { 'ts': { '$gt': last_ts } }  						#To get the latest timestamp from the oplog
+			cursor = db.oplog.rs.find(query, **tail_opts)				#To get the docs which have been changed from the oplog
 			cursor.add_option(_QUERY_OPTIONS['oplog_replay'])
 			while cursor.alive:
 				try:
 					doc=cursor.next()
 					print doc
-					doc_insertor(doc)
+					doc_insertor(doc)									#Inserting found docs into a saperate database for leter processing for notifications.
 				except StopIteration as e:
 					print e,"@"
 					time.sleep(sleep)
