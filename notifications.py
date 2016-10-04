@@ -26,8 +26,25 @@ def fetch_clients(main_field,main_value):
 		client = MongoClient(host,port)
 		db=client[client_db]
 		col=db[client_collection]
+		"""
+			Assumed data structure for the client_collection
+			{
+  				"client_name": "anmol",
+  				"client_email": "anmol13694@gmail.com",
+				"subscription": [
+				    {
+				      "artist_name": ["johny"],
+				      "fields":["all"]
+				    },
+				    {
+				      "artist_name": ["randy"],
+				      "fields":["address","children"]
+				    }
+  								]
+			}
+		"""
 		
-		"""Cases for diferent types in which main_field can be given
+		"""Cases for diferent types in which main_field can be given 
 		Case1:	artist_name: [only one artist]
 		Case2: 	artist_name: [list of multiple artists]
 		Case3:  artist_name: [all]
@@ -51,14 +68,53 @@ def fetch_clients(main_field,main_value):
 
 def process_client(changed_doc,client_doc):
 	print "processing"
+	print changed_doc
 	""" Process each client for their particular specification 
 	Eg:  For instance, Blair only wants to track changes made to Chuck's whereabouts while Georgina wants to track everything about everyone.
 
 	"""
+	try:
+		notification_fields=[] 							#fields to be sent in notifications	
+		changed_doc_fields=changed_doc.keys()
+		remove_field_list=["_id","doc_id","status"]  	# Fields irrelevent to the client (To be removed)
+		for field in remove_field_list:
+			changed_doc_fields.remove(field)         	# Removing irrelevent fields
+		print changed_doc_fields
+		sub=(item for item in client_doc["subscription"] if (changed_doc[main_field] in item[main_field])).next()
+		subscribed_fields=sub["fields"]
+		print"##########"
+		print subscribed_fields
+		#CASE 1: Subscription to particular fields
+		if subscribed_fields!=["all"]:
+			notification_fields=set(subscribed_fields).intersection(changed_doc_fields)
+			notification_fields=list(notification_fields)
+		#CASE 2: Subscription to all fields
+		else:
+			notification_fields=changed_doc_fields
 
+		"""Assumed data structure of notification
+		{
+			"client name":"xyz"
+			"clent email":"abc@xyz.com"
+			.
+			. fields to be notified
+			.
+		}
 
-	print changed_doc,client_doc
-	return "done"
+		"""
+
+		notification={}								#Creating notification to be sent
+		for field in notification_fields:
+			notification[field]=changed_doc[field]
+		notification[main_field]=changed_doc[main_field]
+		notification["client_name"]=client_doc["client_name"]
+		notification["client_email"]=client_doc["client_email"]
+		print notification
+		return notification
+	except Exception as e:
+		print "Failed to generate notificaiton for given client"
+		print e
+		return False
 
 def generate_notifications(changed_doc):
 	print "generating"
@@ -68,9 +124,11 @@ def generate_notifications(changed_doc):
 	notifications_list=[]
 	for client_doc in clients:
 		print client_doc
-		notifications=process_client(changed_doc,client_doc)
-		notifications_list.extend(notifications)
+		notification=process_client(changed_doc,client_doc)
+		if notification:
+			notifications_list.extend(notification)
 	return notifications_list
+
 def send_notifications(notifications):
 	return True
 
