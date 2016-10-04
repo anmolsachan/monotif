@@ -1,9 +1,13 @@
 from oplog_config import host,port,changes_collection,changes_db
 from global_congif import main_field  # Imports field artist name ............not hardcoded for extensibility
-from global_congif import client_db,client_collection
+from global_congif import client_db,client_collection,email,password
 from pymongo import MongoClient
 from pymongo import bulk
 import time
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
+import threading
 def get_changed_docs():
 	""" Function to fetch docs which very whose notificatons have not been sen to the users. """
 	try:
@@ -129,7 +133,36 @@ def generate_notifications(changed_doc):
 			notifications_list.extend(notification)
 	return notifications_list
 
-def send_notifications(notifications):
+def send_email(notification):
+	fromaddr = email
+	toaddr = notification["client_email"]
+	msg = MIMEMultipart()
+	msg['From'] = fromaddr
+	msg['To'] = toaddr
+	msg['Subject'] = "Monotif Notification"
+	 
+	#body = ', '.join("%s=%r" % (key,val) for (key,val) in notification.iteritems())
+	body=srt(notification)
+	print body
+	msg.attach(MIMEText(body, 'plain'))
+	 
+	server = smtplib.SMTP('smtp.gmail.com', 587)
+	server.starttls()
+	server.login(fromaddr,password)
+	text = msg.as_string()
+	server.sendmail(fromaddr, toaddr, text)
+	server.quit()
+def dummy(notification):
+	print "sent"
+
+def send_notifications(notifications): 
+	T = threading.Thread
+	for notification in notifications:
+		while threading.active_count()>10:
+			continue
+		t = T(target=dummy,args=(notification,))
+		t.start()
+
 	return True
 
 
