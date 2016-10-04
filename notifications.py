@@ -143,7 +143,6 @@ def send_email(notification):
 	 
 	#body = ', '.join("%s=%r" % (key,val) for (key,val) in notification.iteritems())
 	body=srt(notification)
-	print body
 	msg.attach(MIMEText(body, 'plain'))
 	 
 	server = smtplib.SMTP('smtp.gmail.com', 587)
