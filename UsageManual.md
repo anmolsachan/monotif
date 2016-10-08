@@ -74,3 +74,9 @@ in the cloned repo directory make the file run.sh executable
 Execute the file run.sh from terminal
   ./run.sh
 ```
+
+10) Making HTTP request for subsription
+```
+Http requests can be made using CURL Requsts ,postman google extension etc.
+Please look into src/tests/http_tests.py for the supported schema for the app.
+```
