@@ -75,7 +75,7 @@ Execute the file run.sh from terminal
   ./run.sh
 ```
 
-10) Making HTTP request for subsription
+10) Making HTTP request for subscription
 ```
 Http requests can be made using CURL Requsts ,postman google extension etc.
 Please look into src/tests/http_tests.py for the supported schema for the app.
