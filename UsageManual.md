@@ -3,11 +3,10 @@ Dependencies - MongoDB setup with replica set enabled(Atleast single node replic
              - Anaconda (Python)
              - Python Flask with httpauth
              
-1. Installing MongoDB
+1) Installing MongoDB
 ```
     https://docs.mongodb.com/manual/administration/install-on-linux/
 ```
-
 2. Setting up replica set for oplog
 ```
 #stop running instance
