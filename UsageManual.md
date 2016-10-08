@@ -40,6 +40,7 @@ conda install -c anaconda pymongo=3.3.0
 https://anaconda.org/anaconda/flask
 conda install -c anaconda flask=0.11.1
 conda install -c melund flask-httpauth=2.3.0
+```
 
 6) Installing git and configurations
 ```
