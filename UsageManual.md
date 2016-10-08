@@ -1,5 +1,5 @@
 Dependencies - MongoDB setup with replica set enabled(Atleast single node replica)
-             - Python (2.7.x)
+             - Python (2.7.x)(Already present in linux)
              - Anaconda (Python)
              - Python Flask with httpauth
              
@@ -40,7 +40,32 @@ conda install -c anaconda pymongo=3.3.0
 https://anaconda.org/anaconda/flask
 conda install -c anaconda flask=0.11.1
 conda install -c melund flask-httpauth=2.3.0
+
+6) Installing git and configurations
+```
+https://guides.github.com/
+https://www.atlassian.com/git/tutorials/
+```
+
+7) Cloning the app Repository
+````
+git clone https://github.com/anmolsachan/monotif
 ````
 
+8) Making changes to configurations(According to users choice)
+```
+Move to src directory in cloned repo.
+Edit file - global_config.
+Set watch_db to the database name on which monitoring has to be setup.
+Set watch_collection to the collection name on which monitoring has to be setup.
+Set the email from which the notifications have to be sent.
+Set the password for email from which the notifications have to be sent.
+```
 
-
+9) Running the app
+```
+From the cloned rep run the make the file run.sh executable
+  chmod +x run.sh
+Execute the file run.sh from terminal
+  ./run.sh`
+```
