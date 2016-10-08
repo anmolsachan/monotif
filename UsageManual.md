@@ -21,22 +21,18 @@ mongo
 #you can now start doing operations in mongo and should see oplog getting populated.
 ```
 3. Installing Anaconda and configure for python2.7
-
 ```
 https://docs.continuum.io/anaconda/install#linux-
 http://conda.pydata.org/docs/py2or3.html
 http://conda.pydata.org/docs/get-started.html
 http://conda.pydata.org/docs/_downloads/conda-cheatsheet.pdf
-
 ```
 4. Installing PYMONGO
-
 ```
 https://anaconda.org/anaconda/pymongo
 conda install -c anaconda pymongo=3.3.0
 ```
-5.
-
+5. Installing Flask
 ````
 https://anaconda.org/anaconda/flask
 conda install -c anaconda flask=0.11.1
