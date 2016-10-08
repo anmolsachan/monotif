@@ -1,12 +1,16 @@
-Dependencies - MongoDB setup with replica set enabled(Atleast single node replica)
+Dependencies 
+```
+             - MongoDB setup with replica set enabled(Atleast single node replica)
              - Python (2.7.x)(Already present in linux)
              - Anaconda (Python)
              - Python Flask with httpauth
+```
              
 1) Installing MongoDB
 ```
     https://docs.mongodb.com/manual/administration/install-on-linux/
 ```
+
 2) Setting up replica set for oplog
 ```
 #stop running instance
@@ -68,5 +72,5 @@ Set the password for email from which the notifications have to be sent.
 From the cloned rep run the make the file run.sh executable
   chmod +x run.sh
 Execute the file run.sh from terminal
-  ./run.sh`
+  ./run.sh
 ```
