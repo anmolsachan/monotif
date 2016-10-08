@@ -61,7 +61,7 @@ def fetch_clients(main_field,main_value):
 												} 
 							}              
 			}
-		print query
+		#print query
 		client_docs=col.find()
 		client.close()
 		return client_docs
@@ -72,7 +72,6 @@ def fetch_clients(main_field,main_value):
 
 def process_client(changed_doc,client_doc):
 	print "processing"
-	print changed_doc
 	""" Process each client for their particular specification 
 	Eg:  For instance, Blair only wants to track changes made to Chuck's whereabouts while Georgina wants to track everything about everyone.
 
@@ -83,11 +82,9 @@ def process_client(changed_doc,client_doc):
 		remove_field_list=["_id","doc_id","status"]  	# Fields irrelevent to the client (To be removed)
 		for field in remove_field_list:
 			changed_doc_fields.remove(field)         	# Removing irrelevent fields
-		print changed_doc_fields
+		#print changed_doc_fields
 		sub=(item for item in client_doc["subscription"] if (changed_doc[main_field] in item[main_field])).next()
 		subscribed_fields=sub["fields"]
-		print"##########"
-		print subscribed_fields
 		#CASE 1: Subscription to particular fields
 		if subscribed_fields!=["all"]:
 			notification_fields=set(subscribed_fields).intersection(changed_doc_fields)
@@ -106,8 +103,7 @@ def process_client(changed_doc,client_doc):
 		}
 
 		"""
-
-		notification={}								#Creating notification to be sent
+		notification={}									#Creating notification to be sent
 		for field in notification_fields:
 			notification[field]=changed_doc[field]
 		notification[main_field]=changed_doc[main_field]
@@ -122,18 +118,17 @@ def process_client(changed_doc,client_doc):
 
 def generate_notifications(changed_doc):
 	print "generating"
-	print changed_doc
 	main_value=changed_doc[main_field]
 	clients=fetch_clients(main_field,main_value)
 	notifications_list=[]
 	for client_doc in clients:
-		print client_doc
 		notification=process_client(changed_doc,client_doc)
 		if notification:
 			notifications_list.extend(notification)
 	return notifications_list
 
 def send_email(notification):
+	""" Function to generate email and send"""
 	fromaddr = email
 	toaddr = notification["client_email"]
 	msg = MIMEMultipart()
@@ -151,6 +146,7 @@ def send_email(notification):
 	text = msg.as_string()
 	server.sendmail(fromaddr, toaddr, text)
 	server.quit()
+
 def dummy(notification):
 	print "sent"
 

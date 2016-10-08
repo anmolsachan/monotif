@@ -39,14 +39,15 @@ def watcher():
 			while cursor.alive:
 				try:
 					doc=cursor.next()
-					print doc
+					#print doc
 					doc_insertor(doc)									#Inserting found docs into a saperate database for leter processing for notifications.
 				except StopIteration as e:
-					print e,"@"
+					#print e
 					time.sleep(sleep)
 	except Exception as e:
 		print("Unable to run oplog_watcher")                            #This error will mostly come if either mongo is not running or replica set is not configured for oplog
 		print e
 		
 if __name__ == '__main__':
+	print "Starting oplog_watcher"
 	watcher()
