@@ -1,6 +1,6 @@
 Before starting coding the app there were three major components that I identified :
 	1) Some kind of service that monitors the changes in MongoDB
-	2) A notification system that sends emails to subscribed users
+	2) A notification system that sends emails to subscribed clients
 	3) An application which handles the HTTP requests from the clients
 
 Steps in developing in part 1) 
