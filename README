@@ -1,1 +1,9 @@
-This is a notification system for MongoDB.
+This is a python application which perfoms the following tasks:
+    -> Monitoring changes in MongoDB database.
+    -> Running a Flask Server for clients to perform following operations:
+          ->Subscribing to changes in MongoDB (Particular field Subscriptions also allowed )
+          ->To check if client already has any subscription
+          ->To update the previous subscription
+          ->To delete the subsription.
+    ->Running a notification system which fetches changes in MongoDB database and sends email notifications
+      to the subscribed clients.
