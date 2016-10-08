@@ -1,4 +1,8 @@
-from global_congif import watch_db,watch_collection,host,port
+"""
+	Test script to insert new data into the database
+
+"""
+from test_config import watch_db,watch_collection,host,port
 from pymongo import MongoClient
 client = MongoClient(host,port)
 import time
