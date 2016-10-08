@@ -69,7 +69,7 @@ Set the password for email from which the notifications have to be sent.
 
 9) Running the app
 ```
-From the cloned rep run the make the file run.sh executable
+in the cloned repo directory make the file run.sh executable
   chmod +x run.sh
 Execute the file run.sh from terminal
   ./run.sh
