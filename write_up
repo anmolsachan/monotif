@@ -1,0 +1,28 @@
+Before starting coding the app there were three major components that I identified :
+	1) Some kind of service that monitors the changes in MongoDB
+	2) A notification system that sends emails to subscribed users
+	3) An application which handles the HTTP requests from the clients
+
+Steps in developing in part 1) 
+	After some googling, I found this : http://stackoverflow.com/questions/9691316/how-to-listen-for-changes-to-a-mongodb-collection .
+	From this page, I got the idea about oplog monitoring and the found this : https://docs.mongodb.com/manual/core/replica-set-oplog/ .
+	After some reading, I found how to setup replica and enable oplog.
+	After this, I wrote the code for oplog watcher .
+	The oplog watcher finds the changes from oplog and indexes them into another db with status "unnotified" for later processing and notifications.
+	I thought rather than directly sending notifications , first I should store the changes which will prevent data loss in case any other service stops and the app fails.
+
+Steps in developing in part 2) 
+	Since I had prior experience with MongoDB I knew how to fetch the changes and generate notifications.
+	Sending emails with python was a new learning here.
+	I found this guide : http://stackabuse.com/how-to-send-emails-with-gmail-using-python/
+	This helped in sending email notifications to client
+
+	Handling client subscriptions for each client was the tricky part :
+		1)I went about this by identifying each change first and then finding each client who has subscribed to this change.
+		2)Field subscriptions were handled by finding the fields in client subscription and then taking an intersection with the fields in changed doc.
+		3)This provided all the changes that had to be sent to the affected clients for one particular change.
+
+Steps in developing part 3)
+	Since I had previous experience with bottle and flask, I chose Flask as it's easy to deploy and very scalable for the kind of app I was making.
+	Flask references : http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+	
