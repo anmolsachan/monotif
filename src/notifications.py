@@ -8,6 +8,8 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 import threading
+import json
+
 def get_changed_docs():
 	""" Function to fetch docs which very whose notificatons have not been sen to the users. """
 	try:
@@ -76,13 +78,13 @@ def process_client(changed_doc,client_doc):
 	Eg:  For instance, Blair only wants to track changes made to Chuck's whereabouts while Georgina wants to track everything about everyone.
 
 	"""
+	
 	try:
 		notification_fields=[] 							#fields to be sent in notifications	
 		changed_doc_fields=changed_doc.keys()
 		remove_field_list=["_id","doc_id","status"]  	# Fields irrelevent to the client (To be removed)
 		for field in remove_field_list:
 			changed_doc_fields.remove(field)         	# Removing irrelevent fields
-		#print changed_doc_fields
 		sub=(item for item in client_doc["subscription"] if (changed_doc[main_field] in item[main_field])).next()
 		subscribed_fields=sub["fields"]
 		#CASE 1: Subscription to particular fields
@@ -101,20 +103,20 @@ def process_client(changed_doc,client_doc):
 			. fields to be notified
 			.
 		}
-
 		"""
-		notification={}									#Creating notification to be sent
+
+		notification={}								#Creating notification to be sent
 		for field in notification_fields:
 			notification[field]=changed_doc[field]
 		notification[main_field]=changed_doc[main_field]
 		notification["client_name"]=client_doc["client_name"]
 		notification["client_email"]=client_doc["client_email"]
-		print notification
 		return notification
 	except Exception as e:
 		print "Failed to generate notificaiton for given client"
 		print e
 		return False
+	
 
 def generate_notifications(changed_doc):
 	print "generating"
@@ -124,41 +126,74 @@ def generate_notifications(changed_doc):
 	for client_doc in clients:
 		notification=process_client(changed_doc,client_doc)
 		if notification:
-			notifications_list.extend(notification)
+			notifications_list.append(notification)
 	return notifications_list
 
+# def send_email(notification):
+# 	""" Function to generate email and send"""
+# 	try:
+# 		print notification
+# 		fromaddr = email
+# 		toaddr = notification["client_email"]
+# 		msg = MIMEMultipart()
+# 		msg['From'] = fromaddr
+# 		msg['To'] = toaddr
+# 		msg['Subject'] = "Monotif Notification"
+		 
+# 		#body = ', '.join("%s=%r" % (key,val) for (key,val) in notification.iteritems())
+# 		body=str(notification)
+# 		msg.attach(MIMEText(body, 'plain'))
+		 
+# 		server = smtplib.SMTP('smtp.gmail.com', 587)
+# 		server.starttls()
+# 		print fromaddr,password	
+# 		server.login(fromaddr,password)
+# 		text = msg.as_string()
+# 		server.sendmail(fromaddr, toaddr, text)
+# 		server.quit()
+# 		return True
+# 	except Exception as e:
+# 		print e
+# 		return False
+
 def send_email(notification):
-	""" Function to generate email and send"""
-	fromaddr = email
-	toaddr = notification["client_email"]
-	msg = MIMEMultipart()
-	msg['From'] = fromaddr
-	msg['To'] = toaddr
-	msg['Subject'] = "Monotif Notification"
-	 
-	#body = ', '.join("%s=%r" % (key,val) for (key,val) in notification.iteritems())
-	body=srt(notification)
-	msg.attach(MIMEText(body, 'plain'))
-	 
-	server = smtplib.SMTP('smtp.gmail.com', 587)
-	server.starttls()
-	server.login(fromaddr,password)
-	text = msg.as_string()
-	server.sendmail(fromaddr, toaddr, text)
-	server.quit()
+	to =notification["client_email"]
+	subject ="Monotif Notification"
+	body =str(notification)
 
-def dummy(notification):
-	print "sent"
+	email_text = """\  
+	From: %s  
+	To: %s  
+	Subject: %s
 
-def send_notifications(notifications): 
-	T = threading.Thread
+	%s
+	""" % (email, ", ".join(to), subject, body)
+
+	try:
+		server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+		server.ehlo()
+		server.login(email,password)
+		server.sendmail(email, to, email_text)
+		server.close()
+		print 'Email sent!'
+		return True
+	except Exception as e:
+		print 'Something went wrong in sending email...'
+		print e
+		return False
+
+def send_notifications(notifications):
+	# T = threading.Thread
+	# for notification in notifications:
+	# 	while threading.active_count()>1:
+	# 		continue
+	# 	t = T(target=send_email,args=(notification,))
+	# 	t.start()
+	status=False
 	for notification in notifications:
-		while threading.active_count()>10:
-			continue
-		t = T(target=dummy,args=(notification,))
-		t.start()
-
-	return True
+		print notification
+		staus=send_email(notification)
+	return status
 
 
 def update_chaged_doc(doc):
@@ -179,8 +214,7 @@ def driver_function():
 		docs=get_changed_docs()
 		if docs != False and docs.count()>0 :
 			for doc in docs:
-				print doc
-				notifications=generate_notifications(doc) # List of notifications to be sent
+				notifications=generate_notifications(doc)			# List of notifications to be sent
 				status=send_notifications(notifications)
 				if status:
 					update_chaged_doc(doc)
