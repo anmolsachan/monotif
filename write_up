@@ -7,7 +7,7 @@ Steps in developing in part 1)
 	After some googling, I found this : http://stackoverflow.com/questions/9691316/how-to-listen-for-changes-to-a-mongodb-collection .
 	From this page, I got the idea about oplog monitoring and the found this : https://docs.mongodb.com/manual/core/replica-set-oplog/ .
 	After some reading, I found how to setup replica and enable oplog.
-	After this, I wrote the code for oplog watcher .
+	After this, I wrote the code for oplog watcher.
 	The oplog watcher finds the changes from oplog and indexes them into another db with status "unnotified" for later processing and notifications.
 	I thought rather than directly sending notifications , first I should store the changes which will prevent data loss in case any other service stops and the app fails.
 
